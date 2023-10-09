@@ -17,17 +17,17 @@ impl DFABuilder {
         }
     }
 
-    pub fn transition(mut self, from: Rc<State>, via: char, to: Rc<State>) -> DFABuilder {
+    pub fn transition(&mut self, from: Rc<State>, via: char, to: Rc<State>) -> &mut DFABuilder {
         self.transitions.insert((from, via), to);
         self
     }
 
-    pub fn accept(mut self, state: Rc<State>) -> DFABuilder {
+    pub fn accept(&mut self, state: Rc<State>) -> &mut DFABuilder {
         self.accept.insert(state);
         self
     }
 
-    pub fn start(mut self, state: Rc<State>) -> DFABuilder {
+    pub fn start(&mut self, state: Rc<State>) -> &mut DFABuilder {
         self.start = Some(state);
         self
     }

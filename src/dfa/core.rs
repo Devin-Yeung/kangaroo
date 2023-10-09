@@ -92,15 +92,15 @@ mod tests {
     #[test]
     fn it_works() {
         state!(q0, q1);
-        let builder = DFABuilder::new();
-        let dfa = builder
+        let mut builder = DFABuilder::new();
+        builder
             .transition(q0.clone(), '0', q1.clone())
             .transition(q0.clone(), '1', q0.clone())
             .transition(q1.clone(), '0', q0.clone())
             .transition(q1.clone(), '1', q1.clone())
             .accept(q1.clone())
-            .start(q0.clone())
-            .build();
+            .start(q0.clone());
+        let dfa = builder.build();
         assert_eq!(
             dfa.cursor().run("010".chars()),
             Evaluation::Reject(q0.clone())
