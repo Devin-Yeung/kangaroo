@@ -1,4 +1,5 @@
 use std::collections::{HashMap, HashSet};
+use std::hash::Hash;
 use std::rc::Rc;
 
 #[derive(Clone, Debug, Eq, PartialEq, Hash)]
@@ -32,6 +33,20 @@ impl DFA {
             return to.clone();
         }
         from
+    }
+
+    pub fn states(&self) -> HashSet<Rc<State>> {
+        let x = self.transitions.values().collect::<HashSet<_>>();
+
+        let y = self
+            .transitions
+            .keys()
+            .map(|(state, _)| state)
+            .collect::<HashSet<_>>();
+
+        x.union(&y)
+            .map(|state| Rc::clone(state))
+            .collect::<HashSet<_>>()
     }
 }
 
@@ -72,6 +87,7 @@ mod tests {
     use crate::dfa::builder::DFABuilder;
     use crate::dfa::core::Evaluation;
     use crate::state;
+    use std::collections::HashSet;
 
     #[test]
     fn it_works() {
@@ -101,5 +117,7 @@ mod tests {
             dfa.cursor().run("01".chars()),
             Evaluation::Accept(q1.clone())
         );
+
+        assert_eq!(dfa.states(), HashSet::from([q0.clone(), q1.clone()]))
     }
 }
