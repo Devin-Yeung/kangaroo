@@ -86,20 +86,33 @@ impl DFA {
 mod tests {
     use crate::dfa::builder::DFABuilder;
     use crate::dfa::core::Evaluation;
-    use crate::state;
+    use crate::{accept, start, state, transition};
     use std::collections::HashSet;
 
     #[test]
     fn it_works() {
         state!(q0, q1);
+
         let mut builder = DFABuilder::new();
-        builder
-            .transition(q0.clone(), '0', q1.clone())
-            .transition(q0.clone(), '1', q0.clone())
-            .transition(q1.clone(), '0', q0.clone())
-            .transition(q1.clone(), '1', q1.clone())
-            .accept(q1.clone())
-            .start(q0.clone());
+
+        start! {
+            builder,
+            q0,
+        }
+
+        transition! {
+            builder,
+            q0, '0' -> q1,
+            q0, '1' -> q0,
+            q1, '0' -> q0,
+            q1, '1' -> q1,
+        }
+
+        accept! {
+            builder,
+            q1,
+        }
+
         let dfa = builder.build();
         assert_eq!(
             dfa.cursor().run("010".chars()),
