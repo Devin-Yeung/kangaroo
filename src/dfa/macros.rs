@@ -1,6 +1,6 @@
 #[macro_export]
 macro_rules! state {
-    ( $( $name:ident ),* ) => {
+    ( $( $name:ident ),* $(,)?) => {
         $(
             let $name = $crate::dfa::core::State::new(stringify!($name));
         )*
@@ -30,4 +30,46 @@ macro_rules! start {
     ($builder:expr, $state:expr, $(,)?) => {
         $builder.start($state.clone());
     };
+}
+
+#[macro_export]
+macro_rules! dfa {
+    (
+
+        $(state {
+            $($name:ident),* $(,)?
+        })?
+
+        start {
+            $start:expr $(,)?
+        }
+
+        transition {
+            $($from:expr, $via:literal -> $to:expr),* $(,)?
+        }
+
+        accept {
+            $($accept:expr),* $(,)?
+        }
+    ) => {{
+        let mut builder = $crate::dfa::builder::DFABuilder::new();
+
+        $(
+            $(
+                let $name = $crate::dfa::core::State::new(stringify!($name));
+            )*
+        )?
+
+        builder.start($start.clone());
+
+        $(
+            builder.transition($from.clone(), $via, $to.clone());
+        )*
+
+        $(
+            builder.accept($accept.clone());
+        )*
+
+        builder.build()
+    }};
 }
