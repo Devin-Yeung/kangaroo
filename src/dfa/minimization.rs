@@ -36,10 +36,12 @@ impl DFA {
                     }
                 });
 
-                let origin = group.clone();
-                // removing the split out item
-                group.retain(|state| !closures.get(state).unwrap().is_subset(&origin));
-                break;
+                if split.len() > 0 {
+                    let origin = group.clone();
+                    // removing the split out item
+                    group.retain(|state| !closures.get(state).unwrap().is_subset(&origin));
+                    break;
+                }
             }
 
             if split.len() == 0 {
@@ -94,6 +96,39 @@ mod tests {
             accept { q5 }
         };
 
-        println!("{:?}", dfa.grouping());
+        println!("{:#?}", dfa.grouping());
+    }
+
+    #[test]
+    fn complicate() {
+        let dfa = dfa! {
+            state { q0, q1, q2, q3, q4, q5 }
+
+            start { q0 }
+
+            transition {
+                q0, '0' -> q1,
+                q0, '1' -> q3,
+
+                q1, '0' -> q4,
+                q1, '1' -> q2,
+
+                q2, '0' -> q4,
+                q2, '1' -> q5,
+
+                q3, '0' -> q1,
+                q3, '1' -> q3,
+
+                q4, '0' -> q3,
+                q4, '1' -> q4,
+
+                q5, '0' -> q4,
+                q5, '1' -> q5,
+            }
+
+            accept { q0, q3 }
+        };
+
+        println!("{:#?}", dfa.grouping());
     }
 }
