@@ -1,3 +1,4 @@
+use crate::dfa::builder::DFABuilder;
 use crate::dfa::core::{State, DFA};
 use std::collections::{HashMap, HashSet};
 use std::rc::Rc;
@@ -5,6 +6,40 @@ use std::rc::Rc;
 impl DFA {
     pub fn minimization(&self) -> DFA {
         todo!()
+    }
+
+    fn merge(dfa: &DFA, groups: Vec<HashSet<Rc<State>>>) -> DFA {
+        let mut mapping: HashMap<Rc<State>, Rc<State>> = HashMap::new();
+        for group in groups {
+            let label = group
+                .iter()
+                .map(|state| state.name.as_str())
+                .collect::<Vec<_>>()
+                .join("");
+            let merged = State::new(label);
+            for state in group {
+                mapping.insert(state, merged.clone());
+            }
+        }
+
+        let mut builder = DFABuilder::new();
+        // building transition table
+        for ((from, via), to) in &dfa.transitions {
+            builder.transition(
+                mapping.get(from).unwrap().clone(),
+                *via,
+                mapping.get(to).unwrap().clone(),
+            );
+        }
+        // building accept state
+        dfa.accept.iter().for_each(|state| {
+            builder.accept(mapping.get(state).unwrap().clone());
+        });
+
+        // building start state
+        builder.start(mapping.get(&dfa.start).unwrap().clone());
+
+        builder.build()
     }
 
     fn grouping(&self) -> Vec<HashSet<Rc<State>>> {
@@ -71,6 +106,7 @@ impl DFA {
 #[cfg(test)]
 mod tests {
     use crate::dfa;
+    use crate::dfa::core::DFA;
 
     #[test]
     fn it_works() {
@@ -130,5 +166,6 @@ mod tests {
         };
 
         println!("{:#?}", dfa.grouping());
+        println!("{}", DFA::merge(&dfa, dfa.grouping()).dot());
     }
 }
