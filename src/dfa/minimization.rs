@@ -231,4 +231,33 @@ mod tests {
             }
         );
     }
+
+    #[test]
+    fn very_complex() {
+        let dfa = dfa! {
+                        state { trap, start, zero, number, neg }
+
+            start { start }
+
+            transitions {
+                trap, ['-'|'0'|'1'|'2'|'3'|'4'|'5'|'6'|'7'|'8'|'9'] -> trap,
+
+                start, ['-'] -> neg,
+                start, ['0'] -> zero,
+                start, ['1'|'2'|'3'|'4'|'5'|'6'|'7'|'8'|'9'] -> number,
+
+                number, ['0'|'1'|'2'|'3'|'4'|'5'|'6'|'7'|'8'|'9'] -> number,
+                number, ['-'] -> trap,
+
+                zero, ['-'|'1'|'2'|'3'|'4'|'5'|'6'|'7'|'8'|'9'] -> trap,
+
+                neg, ['-'|'0'] -> trap,
+                neg, ['1'|'2'|'3'|'4'|'5'|'6'|'7'|'8'|'9'] -> number,
+            }
+
+            accept { number, zero }
+        };
+
+        assert_eq!(dfa.minimization(), dfa);
+    }
 }
