@@ -6,7 +6,7 @@ use std::rc::Rc;
 impl DFA {
     pub fn minimization(&self) -> DFA {
         let groups = self.grouping();
-        DFA::merge(&self, groups)
+        DFA::merge(self, groups)
     }
 
     fn merge(dfa: &DFA, groups: Vec<HashSet<Rc<State>>>) -> DFA {
@@ -72,7 +72,7 @@ impl DFA {
                     }
                 });
 
-                if split.len() > 0 {
+                if !split.is_empty() {
                     let origin = group.clone();
                     // removing the split out item
                     group.retain(|state| !closures.get(state).unwrap().is_subset(&origin));
@@ -80,7 +80,7 @@ impl DFA {
                 }
             }
 
-            if split.len() == 0 {
+            if split.is_empty() {
                 break;
             }
             groups.push(split);
@@ -107,7 +107,6 @@ impl DFA {
 #[cfg(test)]
 mod tests {
     use crate::dfa;
-    use crate::dfa::core::DFA;
 
     #[test]
     fn it_works() {

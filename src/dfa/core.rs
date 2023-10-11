@@ -77,7 +77,7 @@ impl<'a> DFACursor<'a> {
 impl DFA {
     pub fn cursor(&self) -> DFACursor {
         DFACursor {
-            dfa: &self,
+            dfa: self,
             current: self.start.clone(),
         }
     }
