@@ -4,10 +4,13 @@ digraph dfa {
 	edge [fontname="Helvetica,Arial,sans-serif"]
 	rankdir=LR;
 
-	node [shape = doublecircle]; {% for accept in accepts %}{{accept}}{% endfor %};
+	node [shape = doublecircle]; {% for accept in accepts %} {{accept}} {% endfor %};
 
 	node [shape = circle];
 	{% for transition in transitions -%}
 	    {{ transition.from }} -> {{ transition.to }} [label = "{{ transition.via }}", minlen = 2];
 	{% endfor %}
+
+    START [style=invis];
+    START -> {{ start }} [label = "start"]
 }

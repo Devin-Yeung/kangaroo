@@ -22,6 +22,7 @@ impl DFA {
         let template = DFATemplate {
             transitions,
             accepts,
+            start: self.start.name.as_str(),
         };
 
         template.render().unwrap()
@@ -33,6 +34,7 @@ impl DFA {
 pub struct DFATemplate<'a> {
     transitions: Vec<Transition<'a>>,
     accepts: Vec<&'a str>,
+    start: &'a str,
 }
 
 struct Transition<'a> {
