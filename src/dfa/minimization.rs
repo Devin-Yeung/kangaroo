@@ -1,6 +1,7 @@
 use crate::common::core::State;
 use crate::dfa::builder::DFABuilder;
 use crate::dfa::core::DFA;
+use log::debug;
 use std::collections::{HashMap, HashSet};
 use std::rc::Rc;
 
@@ -54,6 +55,7 @@ impl DFA {
                 .map(Rc::clone)
                 .collect(),
         );
+        debug!("Initial Grouping {:#?}", groups);
 
         let closures = self.closures();
 
@@ -74,6 +76,7 @@ impl DFA {
                 });
 
                 if !split.is_empty() {
+                    debug!("Split out: {:?}", split);
                     let origin = group.clone();
                     // removing the split out item
                     group.retain(|state| !closures.get(state).unwrap().is_subset(&origin));
