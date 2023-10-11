@@ -8,6 +8,6 @@ digraph dfa {
 
 	node [shape = circle];
 	{% for transition in transitions -%}
-	    {{ transition.from }} -> {{ transition.to }} [label = "{{ transition.via }}"];
+	    {{ transition.from }} -> {{ transition.to }} [label = "{{ transition.via }}", minlen = 2];
 	{% endfor %}
 }
