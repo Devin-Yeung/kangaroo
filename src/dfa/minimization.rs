@@ -233,7 +233,7 @@ mod tests {
     #[test]
     fn very_complex() {
         let dfa = dfa! {
-                        state { trap, start, zero, number, neg }
+            state { trap, start, zero, number, neg }
 
             start { start }
 
