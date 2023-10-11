@@ -12,6 +12,10 @@ impl DFA {
     }
 
     fn merge(dfa: &DFA, groups: Vec<HashSet<Rc<State>>>) -> DFA {
+        if groups.len() <= 2 {
+            return dfa.clone();
+        }
+
         let mut mapping: HashMap<Rc<State>, Rc<State>> = HashMap::new();
         for group in groups {
             let mut label = group
@@ -58,36 +62,57 @@ impl DFA {
         debug!("Initial Grouping {:#?}", groups);
 
         let closures = self.closures();
-
         loop {
             let mut split: HashSet<Rc<State>> = HashSet::new();
+            let mut idx = 0usize;
 
-            for group in groups.iter_mut() {
+            for (i, group) in groups.iter().enumerate() {
                 // Do nothing for a set of single item
                 if group.len() <= 1 {
                     continue;
                 }
 
-                // find the item to split out
-                group.iter().for_each(|state| {
-                    if closures.get(state).unwrap().is_subset(group) {
-                        split.insert(Rc::clone(state));
-                    }
-                });
+                let mut info = HashMap::<usize, HashSet<Rc<State>>>::new();
 
-                if !split.is_empty() {
-                    debug!("Split out: {:?}", split);
-                    let origin = group.clone();
-                    // removing the split out item
-                    group.retain(|state| !closures.get(state).unwrap().is_subset(&origin));
+                // find the item to split out
+                for state in group.iter() {
+                    for (idx, group) in groups.iter().enumerate() {
+                        if closures.get(state).unwrap().is_subset(group) {
+                            info.entry(idx).or_default();
+                            info.get_mut(&idx).unwrap().insert(state.clone());
+                        }
+                    }
+                }
+
+                for (_, set) in info {
+                    // splitting out all the item in the group is meaningless
+                    if set.len() > 1 && group != &set {
+                        split = set;
+                        idx = i;
+                        break;
+                    }
+                }
+
+                if split.len() > 1 {
                     break;
                 }
             }
 
-            if split.is_empty() {
+            if split.len() > 1 {
+                debug!("Split out: {:?}", split);
+                // avoid dead loop
+                if groups.get(idx).unwrap() == &split {
+                    continue;
+                }
+                // removing the split out item
+                groups
+                    .get_mut(idx)
+                    .unwrap()
+                    .retain(|state| !split.contains(state));
+                groups.push(split);
+            } else {
                 break;
             }
-            groups.push(split);
         }
 
         groups
@@ -204,5 +229,34 @@ mod tests {
                 accept { q0q3 }
             }
         );
+    }
+
+    #[test]
+    fn very_complex() {
+        let dfa = dfa! {
+            state { trap, start, zero, number, neg }
+
+            start { start }
+
+            transitions {
+                trap, ['-'|'0'|'1'|'2'|'3'|'4'|'5'|'6'|'7'|'8'|'9'] -> trap,
+
+                start, ['-'] -> neg,
+                start, ['0'] -> zero,
+                start, ['1'|'2'|'3'|'4'|'5'|'6'|'7'|'8'|'9'] -> number,
+
+                number, ['0'|'1'|'2'|'3'|'4'|'5'|'6'|'7'|'8'|'9'] -> number,
+                number, ['-'] -> trap,
+
+                zero, ['-'|'1'|'2'|'3'|'4'|'5'|'6'|'7'|'8'|'9'] -> trap,
+
+                neg, ['-'|'0'] -> trap,
+                neg, ['1'|'2'|'3'|'4'|'5'|'6'|'7'|'8'|'9'] -> number,
+            }
+
+            accept { number, zero }
+        };
+
+        assert_eq!(dfa.minimization(), dfa);
     }
 }
