@@ -44,9 +44,14 @@ macro_rules! dfa {
             $start:expr $(,)?
         }
 
-        transition {
+        // TODO: need further refactoring
+        $(transition {
             $($from:expr, $via:literal -> $to:expr),* $(,)?
-        }
+        })?
+
+        $(transitions {
+            $($from1:expr, [$($via1:literal)|* $(,)?] -> $to1:expr),* $(,)?
+        })?
 
         accept {
             $($accept:expr),* $(,)?
@@ -63,8 +68,18 @@ macro_rules! dfa {
         builder.start($start.clone());
 
         $(
-            builder.transition($from.clone(), $via, $to.clone());
-        )*
+            $(
+                builder.transition($from.clone(), $via, $to.clone());
+            )*
+        )?
+
+        $(
+            $(
+                $(
+                    builder.transition($from1.clone(), $via1, $to1.clone());
+                )*
+            )*
+        )?
 
         $(
             builder.accept($accept.clone());
