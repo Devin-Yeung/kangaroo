@@ -1,15 +1,32 @@
+use crate::common::core::State;
 use crate::dfa::core::DFA;
 use askama::Template;
+use std::collections::{HashMap, HashSet};
+use std::rc::Rc;
 
 impl DFA {
     pub fn dot(&self) -> String {
-        let transitions = self
-            .transitions
+        let mut mapping: HashMap<(Rc<State>, Rc<State>), HashSet<char>> = HashMap::default();
+
+        for ((from, via), to) in &self.transitions {
+            let key = (from.clone(), to.clone());
+            if !mapping.contains_key(&key) {
+                mapping.insert(key.clone(), HashSet::new());
+            }
+
+            mapping.get_mut(&key).unwrap().insert(*via);
+        }
+
+        let transitions = mapping
             .iter()
-            .map(|((from, via), to)| Transition {
-                from: &from.name,
-                via: *via,
-                to: &to.name,
+            .map(|((from, to), via)| {
+                let mut via = via.iter().map(|c| c.to_string()).collect::<Vec<_>>();
+                via.sort();
+                Transition {
+                    from: &from.name,
+                    via: via.join(","),
+                    to: &to.name,
+                }
             })
             .collect::<Vec<_>>();
 
@@ -39,7 +56,7 @@ pub struct DFATemplate<'a> {
 
 struct Transition<'a> {
     from: &'a str,
-    via: char,
+    via: String,
     to: &'a str,
 }
 
