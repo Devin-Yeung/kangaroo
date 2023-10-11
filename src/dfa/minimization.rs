@@ -1,5 +1,6 @@
+use crate::common::core::State;
 use crate::dfa::builder::DFABuilder;
-use crate::dfa::core::{State, DFA};
+use crate::dfa::core::DFA;
 use std::collections::{HashMap, HashSet};
 use std::rc::Rc;
 

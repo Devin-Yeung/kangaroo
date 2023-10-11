@@ -2,7 +2,7 @@
 macro_rules! state {
     ( $( $name:ident ),* $(,)?) => {
         $(
-            let $name = $crate::dfa::core::State::new(stringify!($name));
+            let $name = $crate::common::core::State::new(stringify!($name));
         )*
     };
 }
@@ -56,7 +56,7 @@ macro_rules! dfa {
 
         $(
             $(
-                let $name = $crate::dfa::core::State::new(stringify!($name));
+                let $name = $crate::common::core::State::new(stringify!($name));
             )*
         )?
 
