@@ -18,3 +18,13 @@ pub enum Evaluation {
     Accept(Rc<State>),
     Reject(Rc<State>),
 }
+
+impl Evaluation {
+    pub fn is_accept(&self) -> bool {
+        matches!(self, Evaluation::Accept(_))
+    }
+
+    pub fn is_reject(&self) -> bool {
+        matches!(self, Evaluation::Reject(_))
+    }
+}
