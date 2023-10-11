@@ -133,7 +133,23 @@ mod tests {
             accept { q5 }
         };
 
-        println!("{:#?}", dfa.grouping());
+        assert_eq!(
+            dfa.minimization(),
+            dfa! {
+                state { q1q2, q3q4, q5 }
+
+                start { q1q2 }
+
+                transition {
+                    q1q2, 'b' -> q1q2,
+                    q1q2, 'a' -> q3q4,
+                    q3q4, 'a' -> q5,
+                    q3q4, 'b' -> q3q4,
+                }
+
+                accept { q5 }
+            }
+        )
     }
 
     #[test]
@@ -166,7 +182,24 @@ mod tests {
             accept { q0, q3 }
         };
 
-        println!("{:#?}", dfa.grouping());
-        println!("{}", DFA::merge(&dfa, dfa.grouping()).dot());
+        assert_eq!(
+            dfa.minimization(),
+            dfa! {
+                state { q1q2q5, q0q3, q4 }
+
+                start { q0q3 }
+
+                transition {
+                    q1q2q5 , '0' -> q4,
+                    q4     , '1' -> q4,
+                    q0q3   , '1' -> q0q3,
+                    q1q2q5 , '1' -> q1q2q5,
+                    q0q3   , '0' -> q1q2q5,
+                    q4     , '0' -> q0q3,
+                }
+
+                accept { q0q3 }
+            }
+        );
     }
 }

@@ -21,6 +21,7 @@ pub enum Evaluation {
     Reject(Rc<State>),
 }
 
+#[derive(PartialEq, Eq, Debug)]
 pub struct DFA {
     pub transitions: HashMap<(Rc<State>, char), Rc<State>>,
     pub start: Rc<State>,
