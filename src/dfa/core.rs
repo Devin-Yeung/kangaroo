@@ -2,7 +2,7 @@ use crate::common::core::{Evaluation, State};
 use std::collections::{HashMap, HashSet};
 use std::rc::Rc;
 
-#[derive(PartialEq, Eq, Debug)]
+#[derive(PartialEq, Eq, Debug, Clone)]
 pub struct DFA {
     pub transitions: HashMap<(Rc<State>, char), Rc<State>>,
     pub start: Rc<State>,
