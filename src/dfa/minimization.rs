@@ -5,18 +5,19 @@ use std::rc::Rc;
 
 impl DFA {
     pub fn minimization(&self) -> DFA {
-        todo!()
+        let groups = self.grouping();
+        DFA::merge(&self, groups)
     }
 
     fn merge(dfa: &DFA, groups: Vec<HashSet<Rc<State>>>) -> DFA {
         let mut mapping: HashMap<Rc<State>, Rc<State>> = HashMap::new();
         for group in groups {
-            let label = group
+            let mut label = group
                 .iter()
                 .map(|state| state.name.as_str())
-                .collect::<Vec<_>>()
-                .join("");
-            let merged = State::new(label);
+                .collect::<Vec<_>>();
+            label.sort(); // make grouping result deterministic
+            let merged = State::new(label.join(""));
             for state in group {
                 mapping.insert(state, merged.clone());
             }
