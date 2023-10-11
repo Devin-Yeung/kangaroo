@@ -85,7 +85,8 @@ impl DFA {
                 }
 
                 for (_, set) in info {
-                    if set.len() > 1 {
+                    // splitting out all the item in the group is meaningless
+                    if set.len() > 1 && group != &set {
                         split = set;
                         idx = i;
                         break;
