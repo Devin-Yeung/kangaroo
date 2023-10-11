@@ -78,9 +78,7 @@ impl DFA {
                 for state in group.iter() {
                     for (idx, group) in groups.iter().enumerate() {
                         if closures.get(state).unwrap().is_subset(group) {
-                            if !info.contains_key(&idx) {
-                                info.insert(idx, HashSet::new());
-                            }
+                            info.entry(idx).or_insert_with(HashSet::new);
                             info.get_mut(&idx).unwrap().insert(state.clone());
                         }
                     }
