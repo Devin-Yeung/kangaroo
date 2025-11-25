@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     name: check-links
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Check Links
         uses: lycheeverse/lychee-action@master
         with:
@@ -29,7 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     name: ubuntu / nightly
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           submodules: true
       - name: Install nightly
@@ -47,7 +47,7 @@ jobs:
     # Unfortunately, hashFiles only works in if on steps, so we repeat it.
     # if: hashFiles('Cargo.lock') != ''
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           submodules: true
       - name: Install beta
